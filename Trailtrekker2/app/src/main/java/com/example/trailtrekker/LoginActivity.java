@@ -47,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (enteredUsername.equals(savedUsername) && enteredPassword.equals(savedPassword)) {
                     // Successful login
                     // Start settings activity and pass the username
-                    Intent intent = new Intent(LoginActivity.this, SettingsActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, Dashboard.class);
                     intent.putExtra("username", enteredUsername);
                     startActivity(intent);
                 } else {
