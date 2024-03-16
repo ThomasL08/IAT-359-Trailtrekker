@@ -3,8 +3,8 @@ package com.example.trailtrekker;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class SplashScreen extends AppCompatActivity {
 
@@ -19,7 +19,7 @@ public class SplashScreen extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(splashScreen.this, MainActivity.class);
+                Intent intent = new Intent(SplashScreen.this, MainActivity.class);
                 startActivity(intent);
                 finish(); // Finish the splash activity to prevent the user from coming back to it using the back button
             }
