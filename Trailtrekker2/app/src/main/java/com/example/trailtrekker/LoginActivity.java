@@ -52,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(intent);
                 } else {
                     // Invalid credentials
-                    Toast.makeText(LoginActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Invalid username or password, register again", Toast.LENGTH_SHORT).show();
                     // Redirect to RegisterActivity for registration
                     Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                     startActivity(intent);
@@ -60,6 +60,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
 
     @Override
     protected void onResume() {

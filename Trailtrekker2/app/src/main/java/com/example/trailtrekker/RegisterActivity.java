@@ -44,10 +44,16 @@ public class RegisterActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("username", enteredUsername);
                     editor.putString("password", enteredPassword);
+
+                    // Set firstTime boolean to false
+                    editor.putBoolean("isFirstTime", false);
+
                     editor.apply();
 
                     // Show success message
                     Toast.makeText(RegisterActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
+
+
 
                     // Redirect to login activity
                     Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
