@@ -89,8 +89,6 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map_fragment);
         mapFragment.getMapAsync(this);
 
-        openWebPageBasedOnLocation();
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         //buttons
@@ -189,6 +187,11 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         startActivity(intent);
     }
 
+    public void onClickRec(View view) {
+        openWebPageBasedOnLocation();
+    }
+
+
 
     //start stopwatch
     private void runStopWatch() {
@@ -210,8 +213,7 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
                 if (exercising) {
                     seconds++;
                 }
-
-                // pst the code again with 1 sec delay
+                // post the code again with 1 sec delay
                 handler.postDelayed(this, 1000);
             }
         });

@@ -58,7 +58,7 @@
             <androidx.gridlayout.widget.GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                app:columnCount="3"
+                app:columnCount="4"
                 app:rowCount="1"
                 android:layout_weight="1"
                 android:background="@color/beige"
@@ -91,7 +91,6 @@
                     app:layout_gravity="fill"
                     android:backgroundTint="@color/orange"/>
 
-
                 <TextView
                     android:id="@+id/durationTV"
                     android:layout_width="0dp"
@@ -99,8 +98,26 @@
                     android:gravity="left|center"
                     android:text="0:00:00"
                     app:layout_gravity="fill"
+                    app:layout_columnWeight="1"
                     android:textSize="26dp"
                     android:textColor="@color/black"/>
+
+                <TextView
+                    android:id="@+id/recButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:background="@color/dark_beige"
+                    android:gravity="center"
+                    android:onClick="onClickRec"
+                    android:padding="10dp"
+                    android:text="Recs"
+                    android:textColor="@color/black"
+                    app:layout_gravity="fill" />
+
+
+
+
             </androidx.gridlayout.widget.GridLayout>
 
 
