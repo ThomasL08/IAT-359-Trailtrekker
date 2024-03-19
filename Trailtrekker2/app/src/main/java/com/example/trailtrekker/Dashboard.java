@@ -34,4 +34,13 @@ public class Dashboard extends AppCompatActivity{
     public void onTile4Click(View view) {
         startActivity(new Intent(this, BikeActivity.class));
     }
+
+    //Navigation Bar///////////////////////////////////////////
+
+    //Method to handle click on Settings
+    public void onSettingsClick(View view) {startActivity(new Intent(this, SettingsActivity.class)); }
+
+
+
+
 }

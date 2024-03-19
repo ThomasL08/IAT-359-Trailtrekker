@@ -368,7 +368,7 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         }
     }
 
-//DISTANCE///////////////////////////////////////////////
+    //DISTANCE///////////////////////////////////////////////
 //Resource: https://stackoverflow.com/questions/21536116/calculating-distance-traveled-in-android-google-maps
     @Override
     public void onLocationChanged(@NonNull Location location) {
@@ -403,8 +403,8 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         if (location != null && prevLocation != null) {
             distanceToLast = location.distanceTo(prevLocation);
         }
-            distance += distanceToLast;
-            prevLocation = location;
+        distance += distanceToLast;
+        prevLocation = location;
     }
 
     public void openWebPageBasedOnLocation() {
