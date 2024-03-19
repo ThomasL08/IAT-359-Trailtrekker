@@ -13,6 +13,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -44,6 +45,9 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
 
     private FusedLocationProviderClient fusedLocationClient;
     GoogleMap myMap;
+
+    private static final double SURREY_LAT = 49.189592;
+    private static final double SURREY_LONG = -122.847834;
 
     //Buttons
     private Button backButton;
@@ -84,6 +88,8 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
 
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map_fragment);
         mapFragment.getMapAsync(this);
+
+        openWebPageBasedOnLocation();
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -399,6 +405,30 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         }
             distance += distanceToLast;
             prevLocation = location;
+    }
+
+    public void openWebPageBasedOnLocation() {
+        Location currentLocation = new Location("");
+        currentLocation.setLatitude(currentLocation.getLatitude()); //i think this isn't the right way to get the lat and long
+        currentLocation.setLongitude(currentLocation.getLongitude());
+
+        // Hardcoded target location
+        Location targetLocation = new Location("");
+        targetLocation.setLatitude(SURREY_LAT);
+        targetLocation.setLongitude(SURREY_LONG);
+
+        float distance = currentLocation.distanceTo(targetLocation);
+
+        float distThreshold = 1000;
+
+        if (distance <= distThreshold) {
+            // Open web page using implicit intent
+            String url = "https://www.alltrails.com/canada/british-columbia/surrey"; // Your target web page URL
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "No hiking spots nearby", Toast.LENGTH_SHORT).show();
+        }
     }
 }
 
