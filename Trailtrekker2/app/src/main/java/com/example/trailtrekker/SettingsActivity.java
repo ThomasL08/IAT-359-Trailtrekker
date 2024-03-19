@@ -1,5 +1,6 @@
 package com.example.trailtrekker;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,10 +19,16 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     private SharedPreferences sharedPreferences;
 
+    MyHelper dbHelper;
+    MyDatabase db;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        dbHelper = new MyHelper(this);
+        db = new MyDatabase(this);
 
         usernameEditText = (EditText) findViewById(R.id.usernameEditText);
         passwordEditText = (EditText) findViewById(R.id.passwordEditText);
@@ -37,6 +44,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         passwordEditText.setText(sharedPreferences.getString("password", savedPassword));
 
         //display saved weight and height data here
+        weightEditText.setText(db.getWeight());
+        heightEditText.setText(db.getHeight());
+
     }
 
     @Override
@@ -60,6 +70,16 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             editor.apply();
 
             // Save weight and height account information here (sqlite database)
+            //updateWeight
+            ContentValues contentValues1 = new ContentValues();
+            contentValues1.put(Constants.WEIGHT, enteredWeight);
+            db.updateRow(1, contentValues1);
+
+            //updateHeight
+            ContentValues contentValues2 = new ContentValues();
+            contentValues2.put(Constants.HEIGHT, enteredHeight);
+            db.updateRow(1, contentValues2);
+
         }
     }
 

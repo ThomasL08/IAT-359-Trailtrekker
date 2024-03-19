@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -43,6 +44,10 @@ import java.util.Locale;
 
 public class HikeExerciseActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, SensorEventListener, LocationListener {
 
+    MyHelper dbHelper;
+    MyDatabase db;
+    Cursor cursor;
+
     private FusedLocationProviderClient fusedLocationClient;
     GoogleMap myMap;
 
@@ -56,6 +61,7 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
     private TextView durationTV;
 
     //Details textviews
+    private TextView titleTV;
     private TextView calTV;
     public TextView disTV;
     private TextView stepTV;
@@ -86,6 +92,9 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hike_exercise);
 
+        dbHelper = new MyHelper(this);
+        db = new MyDatabase(this);
+
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map_fragment);
         mapFragment.getMapAsync(this);
 
@@ -97,6 +106,7 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         stopButton = (Button) findViewById(R.id.stopButton);
 
         //textViews
+        titleTV = (TextView) findViewById(R.id.titleTV);
         durationTV = (TextView) findViewById(R.id.durationTV);
         calTV = (TextView) findViewById(R.id.calTV);
         disTV = (TextView) findViewById(R.id.disTV);
@@ -104,6 +114,13 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         gCalTV = (TextView) findViewById(R.id.gCalTV);
         gDisTV = (TextView) findViewById(R.id.gDisTV);
         gStepTV = (TextView) findViewById(R.id.gStepTV);
+
+        titleTV.setText(db.getTitle());
+        gCalTV.setText("Goal:" + "\n" + db.getCalories());
+        gStepTV.setText("Goal:" + "\n" + db.getStepCount());
+        gDisTV.setText("Goal:" + "\n" + db.getDistance());
+//        Toast.makeText(HikeExerciseActivity.this, db.getTitle(), Toast.LENGTH_SHORT).show();
+
 
         //STOPWATCH/////////////////////////////////////////
         //Resource: https://www.geeksforgeeks.org/how-to-create-a-stopwatch-app-using-android-studio/
@@ -182,15 +199,14 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
     }
 
     public void onClickBack(View view) {
-        //go back to main activity
-        Intent intent = new Intent(HikeExerciseActivity.this, MainActivity.class);
+        //go back to dashboard
+        Intent intent = new Intent(HikeExerciseActivity.this, Dashboard.class);
         startActivity(intent);
     }
 
     public void onClickRec(View view) {
         openWebPageBasedOnLocation();
     }
-
 
 
     //start stopwatch
@@ -388,7 +404,7 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(exercising) {
+                        if (exercising) {
                             disTV.setText(String.format(Locale.getDefault(), "%.2f", distance) + "\n" + "\n" + "M");
                         }
                     }
@@ -411,8 +427,16 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
 
     public void openWebPageBasedOnLocation() {
         Location currentLocation = new Location("");
-        currentLocation.setLatitude(currentLocation.getLatitude()); //i think this isn't the right way to get the lat and long
-        currentLocation.setLongitude(currentLocation.getLongitude());
+//        currentLocation.setLatitude(currentLocation.getLatitude()); //i think this isn't the right way to get the lat and long
+//        currentLocation.setLongitude(currentLocation.getLongitude());
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            return;
+        }
+        currentLocation = myLocationManger.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
 
         // Hardcoded target location
         Location targetLocation = new Location("");
@@ -421,7 +445,7 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
 
         float distance = currentLocation.distanceTo(targetLocation);
 
-        float distThreshold = 1000;
+        float distThreshold = 5000;
 
         if (distance <= distThreshold) {
             // Open web page using implicit intent
