@@ -105,19 +105,20 @@ public class Dashboard extends AppCompatActivity {
         }
     }
 
-    // Method to handle click on Tile 2 (Walk)
+    //mehtod for account
     public void onTile2Click(View view) {
-        startActivity(new Intent(this, WalkActivity.class));
+//        startActivity(new Intent(this, WalkActivity.class));
     }
 
-    // Method to handle click on Tile 3 (Run)
+//method for history
     public void onTile3Click(View view) {
-        startActivity(new Intent(this, RunActivity.class));
+        startActivity(new Intent(this, RecyclerActivity.class));
+
     }
 
-    // Method to handle click on Tile 4 (Bike)
+//method for preferences
     public void onTile4Click(View view) {
-        startActivity(new Intent(this, BikeActivity.class));
+
     }
 
     //Method to handle click on Settings

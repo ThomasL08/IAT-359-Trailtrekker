@@ -63,15 +63,15 @@ public class HikeActivity extends AppCompatActivity {
             case "Hike":
                 questions = Constants.HIKING_QUESTIONS;
                 break;
-            case "Walk":
-                questions = Constants.WALK_QUESTIONS;
-                break;
-            case "Run":
-                questions = Constants.RUN_QUESTIONS;
-                break;
-            case "Bike":
-                questions = Constants.BIKE_QUESTIONS;
-                break;
+//            case "Walk":
+//                questions = Constants.WALK_QUESTIONS;
+//                break;
+//            case "Run":
+//                questions = Constants.RUN_QUESTIONS;
+//                break;
+//            case "Bike":
+//                questions = Constants.BIKE_QUESTIONS;
+//                break;
         }
 
         if (questions != null && currentQuestionIndex < questions.length) {
@@ -96,10 +96,8 @@ public class HikeActivity extends AppCompatActivity {
             switch (index) {
                 case 1:
 //                    Toast.makeText(this, "title saved: " + answer, Toast.LENGTH_SHORT).show();
-//                    ContentValues titleContent = new ContentValues();
-//                    titleContent.put(Constants.TITLE, answer);
-//                    db.updateRow(GlobalVariables.historyIndex, titleContent);
                     db.insertData(Constants.TITLE, answer);
+                    db.insertHistoryTitle(Constants.COLUMN_TITLE, answer);
                     break;
                 case 2:
 //                    Toast.makeText(this, "calories saved: " + answer, Toast.LENGTH_SHORT).show();

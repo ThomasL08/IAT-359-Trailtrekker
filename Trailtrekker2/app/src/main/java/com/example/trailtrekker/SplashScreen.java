@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class SplashScreen extends AppCompatActivity {
 
-    private static final int SPLASH_DELAY = 5000; // 5 seconds
+    private static final int SPLASH_DELAY = 3000; // 3 seconds
     private SharedPreferences sharedPreferences;
 
     private boolean isFirstTime;

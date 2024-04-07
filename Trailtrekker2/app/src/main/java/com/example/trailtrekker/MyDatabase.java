@@ -5,6 +5,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+import java.util.ArrayList;
+
+
+import java.util.List;
 
 public class MyDatabase {
     private SQLiteDatabase db;
@@ -43,21 +48,6 @@ public class MyDatabase {
         contentValues.put(Constants.HEIGHT, height);
         db.insert(Constants.TABLE_NAME, null, contentValues);
     }
-
-    // Retrieving data from a specific column and row
-//    @SuppressLint("Range")
-//    public String getTitle() {
-//        SQLiteDatabase db = helper.getReadableDatabase();
-//        String query = "SELECT " + Constants.TITLE + " FROM " + Constants.TABLE_NAME + " WHERE " + Constants.UID + " = ?";
-//        String[] selectionArgs = {"1"};
-//        Cursor cursor = db.rawQuery(query, selectionArgs);
-//        String result = null;
-//        if (cursor != null && cursor.moveToFirst()) {
-//            result = cursor.getString(cursor.getColumnIndex(Constants.TITLE));
-//            cursor.close();
-//        }
-//        return result;
-//    }
 
     @SuppressLint("Range")
     public String getTitle(int uid) {
@@ -175,5 +165,55 @@ public class MyDatabase {
             cursor.close();
         }
         return count;
+    }
+
+
+
+    //HISTORY//////////////////////////////////////
+
+    public void insertHistoryTitle(String columnName, String newValue) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(columnName, newValue);
+        db.insert(Constants.LOCATION_TABLE_NAME, null, contentValues);
+    }
+
+
+    public List<HistoryItem> getAllHistoryItems() {
+        List<HistoryItem> historyItems = new ArrayList<>();
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            cursor = db.query(
+                    Constants.LOCATION_TABLE_NAME, // Table name
+                    new String[]{Constants.COLUMN_LONGITUDE, Constants.COLUMN_LATITUDE, Constants.COLUMN_TITLE}, // Columns to fetch
+                    null, // Selection
+                    null, // Selection arguments
+                    null, // Group by
+                    null, // Having
+                    null // Order by
+            );
+
+            // Loop through the cursor and create HistoryItem objects
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    @SuppressLint("Range") String longitude = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LONGITUDE));
+                    @SuppressLint("Range") String latitude = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LATITUDE));
+                    @SuppressLint("Range") String title = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_TITLE));
+                    HistoryItem historyItem = new HistoryItem(longitude, latitude, title);
+                    historyItems.add(historyItem);
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e("MyDatabase", "Error fetching history items from database: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+
+        return historyItems;
     }
 }

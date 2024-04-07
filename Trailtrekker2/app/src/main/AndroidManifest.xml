@@ -24,6 +24,9 @@
         android:theme="@style/Theme.Trailtrekker"
         tools:targetApi="31">
         <activity
+            android:name=".RecyclerActivity"
+            android:exported="false" />
+        <activity
             android:name=".UIPreferences"
             android:exported="false" />
         <activity

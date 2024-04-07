@@ -15,7 +15,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
     private EditText usernameEditText, passwordEditText;
-    private Button loginButton;
+    private Button loginButton, createAccButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
         usernameEditText = findViewById(R.id.usernameEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         loginButton = findViewById(R.id.loginButton);
+        createAccButton = findViewById(R.id.cancelButton);
 
         // Get shared preferences
         sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -39,6 +41,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         loginButton.setOnClickListener(v -> loginUser());
+        createAccButton.setOnClickListener(v -> createUser());
     }
 
     private void loginUser() {
@@ -76,6 +79,10 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         }
+    }
+
+    private void createUser() {
+        startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
     }
 
     @Override

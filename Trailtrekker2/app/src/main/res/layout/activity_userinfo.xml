@@ -45,7 +45,8 @@
         android:inputType="text"
         app:layout_constraintStart_toEndOf="@+id/nameLabel"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:textColorHint="@color/lighter_green"/>
 
     <TextView
         android:id="@+id/heightLabel"
@@ -70,7 +71,8 @@
         app:layout_constraintStart_toEndOf="@+id/heightLabel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/heightLabel"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:textColorHint="@color/lighter_green"/>
 
     <TextView
         android:id="@+id/weightLabel"
@@ -95,7 +97,8 @@
         app:layout_constraintStart_toEndOf="@+id/weightLabel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/weightLabel"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:textColorHint="@color/lighter_green"/>
 
     <Button
         android:id="@+id/nextButton"
