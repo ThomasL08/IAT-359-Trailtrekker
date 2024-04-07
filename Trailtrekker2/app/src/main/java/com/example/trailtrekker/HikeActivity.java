@@ -2,8 +2,8 @@ package com.example.trailtrekker;
 
 import android.content.ContentValues;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -18,7 +18,6 @@ public class HikeActivity extends AppCompatActivity {
     private int currentQuestionIndex = 0;
     private String activityType;
 
-    MyHelper dbHelper;
     MyDatabase db;
 
     @Override
@@ -29,8 +28,10 @@ public class HikeActivity extends AppCompatActivity {
         questionTextView = findViewById(R.id.questionTextView);
         answerEditText = findViewById(R.id.answerEditText);
 
-        dbHelper = new MyHelper(this);
         db = new MyDatabase(this);
+
+        GlobalVariables.historyIndex = db.getRowCount()+1;
+        Log.d("count", String.valueOf(GlobalVariables.historyIndex));
 
         // Get the activity type from intent
         Intent intent = getIntent();
@@ -53,11 +54,7 @@ public class HikeActivity extends AppCompatActivity {
     }
 
     public void onNextQuestionClick(View view) {
-//        saveAnswer(currentQuestionIndex);
         showNextQuestion();
-
-
-//        db.deleteAllData();
     }
 
     private void showNextQuestion() {
@@ -83,66 +80,52 @@ public class HikeActivity extends AppCompatActivity {
 
             questionTextView.setText(question);
             answerEditText.setText(""); // Clear previous answer
-            currentQuestionIndex++;
-        }
-        if (currentQuestionIndex == questions.length) {
+//            currentQuestionIndex++;
+        } else {
             // Last question is displayed, start new activity
+            saveAnswer(currentQuestionIndex);
             startActivity(new Intent(this, HikeExerciseActivity.class));
         }
+
+        currentQuestionIndex++;
     }
 
-    private void saveAnswer(Integer index) {
-
-        if (index == 1) {
-            String answer = answerEditText.getText().toString().trim();
-            Toast.makeText(HikeActivity.this, "title saved" + answer, Toast.LENGTH_SHORT).show();
-//            ContentValues contentValues = new ContentValues();
-//            contentValues.put(Constants.NAME, answer);
-
-            db.insertData(1, Constants.NAME, answer);
-        }
-        else if (index == 2) {
-            Toast.makeText(HikeActivity.this, "calories saved", Toast.LENGTH_SHORT).show();
-            String answer = answerEditText.getText().toString().trim();
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(Constants.CALORIES, answer);
-
-            db.updateRow(1, contentValues);
-        }
-        else if (index == 3) {
-            Toast.makeText(HikeActivity.this, "distance saved", Toast.LENGTH_SHORT).show();
-            String answer = answerEditText.getText().toString().trim();
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(Constants.DISTANCE, answer);
-
-            db.updateRow(1, contentValues);
-        }
-
-        else if (index == 4) {
-            Toast.makeText(HikeActivity.this, "step saved", Toast.LENGTH_SHORT).show();
-            String answer = answerEditText.getText().toString().trim();
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(Constants.STEP_COUNT, answer);
-
-            db.updateRow(1, contentValues);
-        }
-        else if (index == 5) {
-            Toast.makeText(HikeActivity.this, "weight saved", Toast.LENGTH_SHORT).show();
-            String answer = answerEditText.getText().toString().trim();
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(Constants.WEIGHT, answer);
-
-            db.updateRow(1, contentValues);
-        }
-        else if (index == 6) {
-            Toast.makeText(HikeActivity.this, "height saved", Toast.LENGTH_SHORT).show();
-            String answer = answerEditText.getText().toString().trim();
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(Constants.HEIGHT, answer);
-
-            db.updateRow(1, contentValues);
+    private void saveAnswer(int index) {
+        String answer = answerEditText.getText().toString().trim();
+        if (!answer.isEmpty()) {
+            switch (index) {
+                case 1:
+//                    Toast.makeText(this, "title saved: " + answer, Toast.LENGTH_SHORT).show();
+//                    ContentValues titleContent = new ContentValues();
+//                    titleContent.put(Constants.TITLE, answer);
+//                    db.updateRow(GlobalVariables.historyIndex, titleContent);
+                    db.insertData(Constants.TITLE, answer);
+                    break;
+                case 2:
+//                    Toast.makeText(this, "calories saved: " + answer, Toast.LENGTH_SHORT).show();
+                    ContentValues caloriesContent = new ContentValues();
+                    caloriesContent.put(Constants.CALORIES, answer);
+                    db.updateRow(GlobalVariables.historyIndex, caloriesContent);
+                    break;
+                case 3:
+//                    Toast.makeText(this, "distance saved: " + answer, Toast.LENGTH_SHORT).show();
+                    ContentValues distanceContent = new ContentValues();
+                    distanceContent.put(Constants.DISTANCE, answer);
+                    db.updateRow(GlobalVariables.historyIndex, distanceContent);
+                    break;
+                case 4:
+//                    Toast.makeText(this, "step count saved: " + answer, Toast.LENGTH_SHORT).show();
+                    ContentValues stepCountContent = new ContentValues();
+                    stepCountContent.put(Constants.STEP_COUNT, answer);
+                    db.updateRow(GlobalVariables.historyIndex, stepCountContent);
+                    break;
+            }
+        } else {
+            Toast.makeText(this, "Please provide an answer", Toast.LENGTH_SHORT).show();
         }
     }
 }
+
+
 
 

@@ -1,6 +1,7 @@
 package com.example.trailtrekker;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -72,20 +73,31 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
     private TextView gStepTV;
 
     //Duration stopwatch
-    private int seconds = 0;
-    private boolean exercising = false;
+//    private int seconds = 0;
+//    private boolean exercising = false;
 
     //Step Counter
     private SensorManager mySensorManager;
     private Sensor stepCountSensor;
-    private Integer stepCount = 0;
+    //    private Integer stepCount = 0;
     private TextView stepCountTV;
 
     //Distance
     private LocationManager myLocationManger;
     private Location prevLocation;
-    private double distance = 0;
+    //    private double distance = 0;
     private float distanceToLast = 0;
+    //    private boolean initialLocationReceived = false;
+
+    //Calories kcal = time [minutes] × ((MET × 3.5) × weight [kg] ÷ 200)
+    private float walkMET = 3.0f;
+    private int calories = 0;
+    private int weight;
+//    private int calSeconds;
+
+    //other
+    private static Handler handler = new Handler();
+    private boolean isStopWatchRunning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +117,15 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         startButton = (Button) findViewById(R.id.startButton);
         stopButton = (Button) findViewById(R.id.stopButton);
 
+        if(GlobalVariables.exercising){
+            startButton.setVisibility(View.GONE);
+            stopButton.setVisibility(View.VISIBLE);
+        }
+        else{
+            startButton.setVisibility(View.VISIBLE);
+            stopButton.setVisibility(View.GONE);
+        }
+
         //textViews
         titleTV = (TextView) findViewById(R.id.titleTV);
         durationTV = (TextView) findViewById(R.id.durationTV);
@@ -115,20 +136,11 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         gDisTV = (TextView) findViewById(R.id.gDisTV);
         gStepTV = (TextView) findViewById(R.id.gStepTV);
 
-        titleTV.setText(db.getTitle());
-        gCalTV.setText("Goal:" + "\n" + db.getCalories());
-        gStepTV.setText("Goal:" + "\n" + db.getStepCount());
-        gDisTV.setText("Goal:" + "\n" + db.getDistance());
-//        Toast.makeText(HikeExerciseActivity.this, db.getTitle(), Toast.LENGTH_SHORT).show();
+        titleTV.setText(db.getTitle(GlobalVariables.historyIndex));
+        gCalTV.setText("Goal:" + "\n" + db.getCalories(GlobalVariables.historyIndex));
+        gStepTV.setText("Goal:" + "\n" + db.getStepCount(GlobalVariables.historyIndex));
+        gDisTV.setText("Goal:" + "\n" + db.getDistance(GlobalVariables.historyIndex));
 
-
-        //STOPWATCH/////////////////////////////////////////
-        //Resource: https://www.geeksforgeeks.org/how-to-create-a-stopwatch-app-using-android-studio/
-        if (savedInstanceState != null) {
-            seconds = savedInstanceState.getInt("seconds");
-            exercising = savedInstanceState.getBoolean("exercising");
-        }
-        runStopWatch();
 
         //STEP COUNTER/////////////////////////////////////////
         stepCountTV = findViewById(R.id.stepTV);
@@ -166,32 +178,49 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         //CALORIE COUNTER/////////////////////////////////////////
         calTV = findViewById(R.id.calTV);
         calTV.setText("-" + "\n" + "\n" + "KCAL");
+        weight = Integer.parseInt(db.getWeight());
+        countCalories(walkMET, weight);
+        prevLocation = myLocationManger.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+
     }
 
     //ACTIVITY/////////////////////////////////////////
     public void onClickStart(View view) {
-        seconds = 0;
-        exercising = true;
+        GlobalVariables.historyIndex++;
 
-        //swap start and stop buttons
-        startButton.setVisibility(View.GONE);
-        stopButton.setVisibility(View.VISIBLE);
-        showCurrentLocation();
+        //Check if physical activity permission is granted
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
+            requestPhysActPermission();
+        } else {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                return;
+            }
 
-        stepTV.setText("0" + "\n" + "\n" + "STEPS");
-        distance = 0;
-        disTV.setText(String.format(Locale.getDefault(), "%.2f", distance) + "\n" + "\n" + "M");
+            //initialize prevlocation to where user hits start button
+            prevLocation = myLocationManger.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            return;
+            GlobalVariables.seconds = 0;
+            GlobalVariables.exercising = true;
+            GlobalVariables.distance = 0;
+            GlobalVariables.stepCount = 0;
+
+            //swap start and stop buttons
+            startButton.setVisibility(View.GONE);
+            stopButton.setVisibility(View.VISIBLE);
+            showCurrentLocation();
+
+            stepTV.setText("0" + "\n" + "\n" + "STEPS");
+            disTV.setText("0" + "\n" + "\n" + "M");
+            calTV.setText("0" + "\n" + "\n" + "KCAL");
         }
-        prevLocation = myLocationManger.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     }
 
     public void onClickStop(View view) {
-        exercising = false;
+        GlobalVariables.exercising = false;
+        isStopWatchRunning = false;
 
         //swap start and stop buttons
         startButton.setVisibility(View.VISIBLE);
@@ -199,6 +228,7 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
     }
 
     public void onClickBack(View view) {
+        Log.d("b", String.valueOf(GlobalVariables.exercising));
         //go back to dashboard
         Intent intent = new Intent(HikeExerciseActivity.this, Dashboard.class);
         startActivity(intent);
@@ -211,28 +241,35 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
 
     //start stopwatch
     private void runStopWatch() {
-        final Handler handler = new Handler();
+        if (!isStopWatchRunning) {
 
-        handler.post(new Runnable() {
-            @Override
+            isStopWatchRunning = true;
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    int hours = GlobalVariables.seconds / 3600;
+                    int minutes = (GlobalVariables.seconds % 3600) / 60;
+                    int secs = GlobalVariables.seconds % 60;
 
-            public void run() {
-                int hours = seconds / 3600;
-                int minutes = (seconds % 3600) / 60;
-                int secs = seconds % 60;
+                    //format to readable time
+                    String time = String.format(Locale.getDefault(), "%d:%02d:%02d", hours, minutes, secs);
+                    durationTV.setText(time);
 
-                //format to readable time
-                String time = String.format(Locale.getDefault(), "%d:%02d:%02d", hours, minutes, secs);
-                durationTV.setText(time);
-
-                //increment time when start button has been pressed
-                if (exercising) {
-                    seconds++;
+                    //increment time when start button has been pressed
+                    if (GlobalVariables.exercising) {
+                        GlobalVariables.seconds++;
+//                        calSeconds++;
+                    }
+                    // post the code again with 1 sec delay
+                    handler.postDelayed(this, 1000);
                 }
-                // post the code again with 1 sec delay
-                handler.postDelayed(this, 1000);
-            }
-        });
+            });
+        }
+    }
+
+    private void stopStopWatch() {
+        handler.removeCallbacksAndMessages(null);
+        isStopWatchRunning = false;
     }
 
     //Save exercise duration
@@ -240,23 +277,31 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
 
-        savedInstanceState.putInt("seconds", seconds);
-        savedInstanceState.putBoolean("exercising", exercising);
+//        savedInstanceState.putInt("seconds", seconds);
+//        savedInstanceState.putBoolean("exercising", exercising);
     }
 
     //STOPWATCH/////////////////////////////////////////
 
     protected void onResume() {
+        Log.d("testing", String.valueOf(GlobalVariables.exercising));
         super.onResume();
+        runStopWatch();
+        countCalories(walkMET, weight);
         //register SensorEventListeners
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            return;
+        }
+//        prevLocation = myLocationManger.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         mySensorManager.registerListener(this, stepCountSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        //dont unregister because app should keep working
+        stopStopWatch();
 
     }
 
@@ -268,11 +313,11 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER && exercising) {
-            stepCount++;
-            stepCountTV.setText(String.valueOf(stepCount) + "\n" + "\n" + "STEPS");
+        if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER && GlobalVariables.exercising) {
+            GlobalVariables.stepCount++;
+            stepCountTV.setText(String.valueOf(GlobalVariables.stepCount) + "\n" + "\n" + "STEPS");
         } else {
-            stepCount = 0;
+            GlobalVariables.stepCount = 0;
 
         }
     }
@@ -284,29 +329,90 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
 
     //GOOGLE MAP/////////////////////////////////////////
     @Override
-    public void onMapReady(GoogleMap map) {
-        myMap = map;
+    public void onMapReady(GoogleMap googleMap) {
+        myMap = googleMap;
 
-        checkLocationPermission();
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+        // Check if location permission is granted
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Location permission not granted, request it from the user
+            requestLocationPermission();
+        }
+        else {
+            // Location permission granted, show current location
+            showCurrentLocation();
+
+            // Enable My Location button and set listeners
+            myMap.setMyLocationEnabled(true);
+            myMap.setOnMyLocationButtonClickListener(this);
+            myMap.setOnMyLocationClickListener(this);
+        }
+
+//        if (checkLocationPermission()) {
+//            myMap.setMyLocationEnabled(true);
+//            myMap.setOnMyLocationButtonClickListener(this);
+//            myMap.setOnMyLocationClickListener(this);
+//
+//            // Zoom to Surrey
+//            LatLng surrey = new LatLng(SURREY_LAT, SURREY_LONG);
+//            CameraUpdate update = CameraUpdateFactory.newLatLngZoom(surrey, 15);
+//            myMap.animateCamera(update);
+//        }
+    }
+
+    // Method to request location permission from the user
+    private void requestLocationPermission() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.title_location_permission)
+                .setMessage(R.string.text_location_permission)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-
-                        LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
-                        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latlng, 15);
-                        myMap.animateCamera(update);
-
-
-                        if (location != null) {
-                            // Logic to handle location object
-                        }
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // Request location permission
+                        ActivityCompat.requestPermissions(HikeExerciseActivity.this,
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                MY_PERMISSIONS_REQUEST_LOCATION);
                     }
-                });
-        myMap.setMyLocationEnabled(true);
-        myMap.setOnMyLocationButtonClickListener(this);
-        myMap.setOnMyLocationClickListener(this);
+                })
+                .create()
+                .show();
+    }
+
+
+    // Method to handle the result of location permission request
+    @SuppressLint("MissingPermission")
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_PERMISSIONS_REQUEST_LOCATION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Location permission granted, show current location
+                showCurrentLocation();
+                // Enable My Location button and set listeners
+                myMap.setMyLocationEnabled(true);
+                myMap.setOnMyLocationButtonClickListener(this);
+                myMap.setOnMyLocationClickListener(this);
+            } else {
+                // Location permission denied, handle accordingly (e.g., display a message)
+                Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    // Method to request physical activity permission from the user
+    private void requestPhysActPermission() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.title_activity_permission)
+                .setMessage(R.string.text_activity_permission)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // Request location permission
+                        ActivityCompat.requestPermissions(HikeExerciseActivity.this,
+                                new String[]{Manifest.permission.ACTIVITY_RECOGNITION},
+                                MY_PERMISSIONS_REQUEST_ACTIVITY);
+                    }
+                })
+                .create()
+                .show();
     }
 
     public void showCurrentLocation() {
@@ -348,43 +454,45 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 1;
-
-    public boolean checkLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.title_location_permission)
-                        .setMessage(R.string.text_location_permission)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                //Prompt the user once explanation has been shown
-                                ActivityCompat.requestPermissions(HikeExerciseActivity.this,
-                                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                                        MY_PERMISSIONS_REQUEST_LOCATION);
-                            }
-                        })
-                        .create()
-                        .show();
+    public static final int MY_PERMISSIONS_REQUEST_ACTIVITY = 1;
 
 
-            } else {
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this,
-                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_LOCATION);
-            }
-            return false;
-        } else {
-            return true;
-        }
-    }
+//    public boolean checkLocationPermission() {
+//        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//
+//            // Should we show an explanation?
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+//
+//                // Show an explanation to the user *asynchronously* -- don't block
+//                // this thread waiting for the user's response! After the user
+//                // sees the explanation, try again to request the permission.
+//                new AlertDialog.Builder(this)
+//                        .setTitle(R.string.title_location_permission)
+//                        .setMessage(R.string.text_location_permission)
+//                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                //Prompt the user once explanation has been shown
+//                                ActivityCompat.requestPermissions(HikeExerciseActivity.this,
+//                                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+//                                        MY_PERMISSIONS_REQUEST_LOCATION);
+//                            }
+//                        })
+//                        .create()
+//                        .show();
+//
+//
+//            } else {
+//                // No explanation needed, we can request the permission.
+//                ActivityCompat.requestPermissions(this,
+//                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+//                        MY_PERMISSIONS_REQUEST_LOCATION);
+//            }
+//            return false;
+//        } else {
+//            return true;
+//        }
+//    }
 
     //DISTANCE///////////////////////////////////////////////
 //Resource: https://stackoverflow.com/questions/21536116/calculating-distance-traveled-in-android-google-maps
@@ -404,8 +512,8 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (exercising) {
-                            disTV.setText(String.format(Locale.getDefault(), "%.2f", distance) + "\n" + "\n" + "M");
+                        if (GlobalVariables.exercising) {
+                            disTV.setText(String.format(Locale.getDefault(), "%.2f", GlobalVariables.distance) + "\n" + "\n" + "M");
                         }
                     }
                 });
@@ -418,17 +526,39 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
     //method that gets distance between previous and current location and adds to cumulative distance
     public void updateLocation(Location location) {
         Log.d("test", "updateLocation() called");
-        if (location != null && prevLocation != null) {
+//        if (location != null && prevLocation != null) {
             distanceToLast = location.distanceTo(prevLocation);
-        }
-        distance += distanceToLast;
+//        }
+        GlobalVariables.distance += distanceToLast;
         prevLocation = location;
+    }
+
+    //CALORIES///////////////////////////////////////////////
+    //kcal = time [minutes] × ((MET × 3.5) × weight [kg] ÷ 200)
+    private void countCalories(Float walkMET, Integer weight) {
+        if (!isStopWatchRunning) {
+            final Handler handler = new Handler();
+
+            handler.post(new Runnable() {
+                @Override
+
+                public void run() {
+
+                    if (GlobalVariables.exercising) {
+//                    calories = (int) (calSeconds/60 * (walkMET * 3.5) * weight / 200);
+                        GlobalVariables.calories = (int) (GlobalVariables.seconds / 60 * (walkMET * 3.5) * weight / 200);
+                    }
+                    calTV.setText(Integer.toString(GlobalVariables.calories) + "\n" + "\n" + "KCAL");
+
+                    // post the code again with 1 sec delay
+                    handler.postDelayed(this, 5000);
+                }
+            });
+        }
     }
 
     public void openWebPageBasedOnLocation() {
         Location currentLocation = new Location("");
-//        currentLocation.setLatitude(currentLocation.getLatitude()); //i think this isn't the right way to get the lat and long
-//        currentLocation.setLongitude(currentLocation.getLongitude());
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling

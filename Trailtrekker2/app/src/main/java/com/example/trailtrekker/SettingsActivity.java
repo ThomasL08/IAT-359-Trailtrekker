@@ -88,5 +88,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         Intent intent = new Intent(SettingsActivity.this, Dashboard.class);
         startActivity(intent);
     }
+    public void openUIPreferences(View view) {
+        Intent intent = new Intent(this, UIPreferences.class);
+        startActivity(intent);
+    }
 
 }

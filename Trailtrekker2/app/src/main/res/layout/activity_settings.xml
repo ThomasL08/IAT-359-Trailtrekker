@@ -4,13 +4,22 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/settings_bg" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="20dp"
-        android:background="@drawable/background"
-        android:scaleType="centerCrop">
+        android:padding="20dp">
 
         <androidx.gridlayout.widget.GridLayout
             android:layout_width="match_parent"
@@ -25,23 +34,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginRight="10dp"
-                android:backgroundTint="@color/dark_beige"
+                android:backgroundTint="@color/green"
                 android:gravity="center"
                 android:onClick="onClickBack"
                 android:text="Back"
-                android:textColor="@color/black"
+                android:textColor="@color/dark_beige"
                 android:visibility="visible"
                 app:layout_column="0"
                 app:layout_gravity="fill"
                 app:layout_row="0" />
 
-            <TextView
-                android:id="@+id/titleTV"
+            <Button
+                android:id="@+id/titleButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="left|center"
                 android:text="Settings"
-                app:layout_columnWeight="3"
+                app:layout_columnWeight="2"
                 app:layout_gravity="fill"
                 android:textColor="@color/beige"/>
 
@@ -53,18 +62,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Username:"
-            android:textColor="@color/beige"
             android:layout_marginBottom="10dp"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="20dp"
+            android:textColor="@color/dark_green"
+            android:textSize="18dp"/>
 
         <EditText
             android:id="@+id/usernameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:text="Username"
             android:padding="15dp"
-            android:background="@color/dark_beige"
+            android:background="@drawable/edit_text_outline"
+            android:hint="@string/username_hint"
+
+
             android:gravity="left|center"
             app:layout_columnWeight="1"
             app:layout_gravity="fill"
@@ -76,22 +88,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Password:"
-            android:textColor="@color/beige"
             android:layout_marginBottom="10dp"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="20dp"
+            android:textColor="@color/dark_green"
+            android:textSize="18dp"/>
 
         <EditText
             android:id="@+id/passwordEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="@color/dark_beige"
+            android:background="@drawable/edit_text_outline"
+            android:hint="@string/password_hint"
             android:ems="10"
             android:gravity="left|center"
             android:inputType="text"
             android:padding="15dp"
-            android:text="Password"
-            android:textColor="@color/black"
             app:layout_columnWeight="1"
             app:layout_gravity="fill" />
 
@@ -100,22 +112,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Weight:"
-            android:textColor="@color/beige"
             android:layout_marginBottom="10dp"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="20dp"
+            android:textColor="@color/dark_green"
+            android:textSize="18dp"/>
 
         <EditText
             android:id="@+id/weightEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:text="Weight"
             android:padding="15dp"
-            android:background="@color/dark_beige"
+            android:background="@drawable/edit_text_outline"
+            android:hint="weight"
             android:gravity="left|center"
             app:layout_columnWeight="1"
             app:layout_gravity="fill"
-            android:textColor="@color/black"
             android:inputType="text"
             android:layout_marginBottom="10dp"/>
 
@@ -123,19 +135,20 @@
             android:id="@+id/heightTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Username:"
-            android:textColor="@color/beige"
+            android:layout_marginTop="20dp"
             android:layout_marginBottom="10dp"
-            android:layout_marginTop="20dp"/>
+            android:text="Height:"
+            android:textColor="@color/dark_green"
+            android:textSize="18dp"/>
 
         <EditText
             android:id="@+id/heightEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:text="Height"
             android:padding="15dp"
-            android:background="@color/dark_beige"
+            android:background="@drawable/edit_text_outline"
+            android:hint="height"
             android:gravity="left|center"
             app:layout_columnWeight="1"
             app:layout_gravity="fill"
@@ -148,9 +161,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:backgroundTint="@color/green"
+            android:backgroundTint="@color/dark_green"
+            android:textColor="@color/dark_beige"
             android:onClick="onClick"
             android:text="Save" />
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

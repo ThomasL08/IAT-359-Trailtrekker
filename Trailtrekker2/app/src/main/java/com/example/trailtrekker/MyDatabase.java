@@ -5,14 +5,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.widget.Toast;
 
 public class MyDatabase {
     private SQLiteDatabase db;
     private Context context;
     private final MyHelper helper;
 
-    public MyDatabase (Context c){
+    public MyDatabase(Context c) {
         context = c;
         helper = new MyHelper(context);
     }
@@ -22,81 +21,64 @@ public class MyDatabase {
         db.delete(Constants.TABLE_NAME, null, null);
     }
 
-
-
     public void updateRow(long rowId, ContentValues contentValues) {
         SQLiteDatabase db = helper.getWritableDatabase();
-
         String selection = Constants.UID + "=?";
-        String[] selectionArgs = { String.valueOf(rowId) }; // Specify the row to update using the row ID
-
+        String[] selectionArgs = {String.valueOf(rowId)};
         db.update(Constants.TABLE_NAME, contentValues, selection, selectionArgs);
-
     }
-    public void insertData(long rowId, String columnName, String newValue) {
-        SQLiteDatabase db = helper.getWritableDatabase();
 
+    public void insertData(String columnName, String newValue) {
+        SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(columnName, newValue);
-
         db.insert(Constants.TABLE_NAME, null, contentValues);
-
     }
-//
-//    public void updateCalories(long rowId, String columnName, String newValue) {
-//        SQLiteDatabase db = helper.getWritableDatabase();
-//
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(columnName, newValue);
-//
-//        db.insert(Constants.TABLE_NAME, null, contentValues);
-//
-//    }
-//
-//    public void updateStepCount(long rowId, String columnName, String newValue) {
-//        SQLiteDatabase db = helper.getWritableDatabase();
-//
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(columnName, newValue);
-//
-//        db.insert(Constants.TABLE_NAME, null, contentValues);
-//
-//    }
-//
-//
-//    public void updateWeight(long rowId, String columnName, String newValue) {
-//        SQLiteDatabase db = helper.getWritableDatabase();
-//
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(columnName, newValue);
-//
-//        db.insert(Constants.TABLE_NAME, null, contentValues);
-//
-//    }
-//
-//    public void updateHeight(long rowId, String columnName, String newValue) {
-//        SQLiteDatabase db = helper.getWritableDatabase();
-//
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(columnName, newValue);
-//
-//        db.insert(Constants.TABLE_NAME, null, contentValues);
-//
+
+    public void insertUserInfo(String name, double weight, double height) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Constants.NAME, name);
+        contentValues.put(Constants.WEIGHT, weight);
+        contentValues.put(Constants.HEIGHT, height);
+        db.insert(Constants.TABLE_NAME, null, contentValues);
+    }
+
+    // Retrieving data from a specific column and row
+//    @SuppressLint("Range")
+//    public String getTitle() {
+//        SQLiteDatabase db = helper.getReadableDatabase();
+//        String query = "SELECT " + Constants.TITLE + " FROM " + Constants.TABLE_NAME + " WHERE " + Constants.UID + " = ?";
+//        String[] selectionArgs = {"1"};
+//        Cursor cursor = db.rawQuery(query, selectionArgs);
+//        String result = null;
+//        if (cursor != null && cursor.moveToFirst()) {
+//            result = cursor.getString(cursor.getColumnIndex(Constants.TITLE));
+//            cursor.close();
+//        }
+//        return result;
 //    }
 
-
-
-
-    //retrieving data from a specific column and row
     @SuppressLint("Range")
-    public String getTitle() {
+    public String getTitle(int uid) {
         SQLiteDatabase db = helper.getReadableDatabase();
-
-        String query = "SELECT " + Constants.NAME + " FROM " + Constants.TABLE_NAME +
-                " WHERE " + Constants.UID + " = ?";
-        String[] selectionArgs = { "1" }; // ID 3
+        String query = "SELECT " + Constants.TITLE + " FROM " + Constants.TABLE_NAME + " WHERE " + Constants.UID + " = ?";
+        String[] selectionArgs = {String.valueOf(uid)}; // Convert uid to string array
         Cursor cursor = db.rawQuery(query, selectionArgs);
+        String result = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            result = cursor.getString(cursor.getColumnIndex(Constants.TITLE));
+            cursor.close();
+        }
+        return result;
+    }
 
+    @SuppressLint("Range")
+    public String getName() {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        String query = "SELECT " + Constants.NAME + " FROM " + Constants.TABLE_NAME + " WHERE " + Constants.UID + " = ?";
+        String[] selectionArgs = {"1"};
+        Cursor cursor = db.rawQuery(query, selectionArgs);
         String result = null;
         if (cursor != null && cursor.moveToFirst()) {
             result = cursor.getString(cursor.getColumnIndex(Constants.NAME));
@@ -105,15 +87,13 @@ public class MyDatabase {
         return result;
     }
 
+
     @SuppressLint("Range")
-    public String getCalories() {
+    public String getCalories(int uid) {
         SQLiteDatabase db = helper.getReadableDatabase();
-
-        String query = "SELECT " + Constants.CALORIES + " FROM " + Constants.TABLE_NAME +
-                " WHERE " + Constants.UID + " = ?";
-        String[] selectionArgs = { "1" }; // ID 3
+        String query = "SELECT " + Constants.CALORIES + " FROM " + Constants.TABLE_NAME + " WHERE " + Constants.UID + " = ?";
+        String[] selectionArgs = {String.valueOf(uid)}; // Convert uid to string array
         Cursor cursor = db.rawQuery(query, selectionArgs);
-
         String result = null;
         if (cursor != null && cursor.moveToFirst()) {
             result = cursor.getString(cursor.getColumnIndex(Constants.CALORIES));
@@ -121,15 +101,14 @@ public class MyDatabase {
         }
         return result;
     }
+
+
     @SuppressLint("Range")
-    public String getStepCount() {
+    public String getStepCount(int uid) {
         SQLiteDatabase db = helper.getReadableDatabase();
-
-        String query = "SELECT " + Constants.STEP_COUNT + " FROM " + Constants.TABLE_NAME +
-                " WHERE " + Constants.UID + " = ?";
-        String[] selectionArgs = { "1" }; // ID 3
+        String query = "SELECT " + Constants.STEP_COUNT + " FROM " + Constants.TABLE_NAME + " WHERE " + Constants.UID + " = ?";
+        String[] selectionArgs = {String.valueOf(uid)}; // Convert uid to string array
         Cursor cursor = db.rawQuery(query, selectionArgs);
-
         String result = null;
         if (cursor != null && cursor.moveToFirst()) {
             result = cursor.getString(cursor.getColumnIndex(Constants.STEP_COUNT));
@@ -139,14 +118,11 @@ public class MyDatabase {
     }
 
     @SuppressLint("Range")
-    public String getDistance() {
+    public String getDistance(int uid) {
         SQLiteDatabase db = helper.getReadableDatabase();
-
-        String query = "SELECT " + Constants.DISTANCE + " FROM " + Constants.TABLE_NAME +
-                " WHERE " + Constants.UID + " = ?";
-        String[] selectionArgs = { "1" }; // ID 3
+        String query = "SELECT " + Constants.DISTANCE + " FROM " + Constants.TABLE_NAME + " WHERE " + Constants.UID + " = ?";
+        String[] selectionArgs = {String.valueOf(uid)}; // Convert uid to string array
         Cursor cursor = db.rawQuery(query, selectionArgs);
-
         String result = null;
         if (cursor != null && cursor.moveToFirst()) {
             result = cursor.getString(cursor.getColumnIndex(Constants.DISTANCE));
@@ -161,7 +137,7 @@ public class MyDatabase {
 
         String query = "SELECT " + Constants.WEIGHT + " FROM " + Constants.TABLE_NAME +
                 " WHERE " + Constants.UID + " = ?";
-        String[] selectionArgs = { "1" }; // ID 3
+        String[] selectionArgs = { "1" }; // ID 1
         Cursor cursor = db.rawQuery(query, selectionArgs);
 
         String result = null;
@@ -178,7 +154,7 @@ public class MyDatabase {
 
         String query = "SELECT " + Constants.HEIGHT + " FROM " + Constants.TABLE_NAME +
                 " WHERE " + Constants.UID + " = ?";
-        String[] selectionArgs = { "1" }; // ID 3
+        String[] selectionArgs = { "1" }; // ID 1
         Cursor cursor = db.rawQuery(query, selectionArgs);
 
         String result = null;
@@ -187,5 +163,17 @@ public class MyDatabase {
             cursor.close();
         }
         return result;
+    }
+
+    public int getRowCount() {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + Constants.TABLE_NAME, null);
+        int count = 0;
+        if (cursor != null) {
+            cursor.moveToFirst();
+            count = cursor.getInt(0);
+            cursor.close();
+        }
+        return count;
     }
 }
