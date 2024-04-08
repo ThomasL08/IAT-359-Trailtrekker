@@ -27,7 +27,10 @@ public class MyHelper extends SQLiteOpenHelper {
                     Constants.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     Constants.COLUMN_TITLE + " TEXT, " +
                     Constants.COLUMN_LATITUDE + " REAL, " +
-                    Constants.COLUMN_LONGITUDE + " REAL);";
+                    Constants.COLUMN_LONGITUDE + " REAL, " +
+                    Constants.COLUMN_CALORIES + " TEXT, " +
+                    Constants.COLUMN_STEPS + " TEXT, " +
+                    Constants.COLUMN_DISTANCE + " TEXT);";
 
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS " + Constants.TABLE_NAME;
 
@@ -61,22 +64,22 @@ public class MyHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void insertLocation(double latitude, double longitude) {
-        SQLiteDatabase db = null;
-        try {
-            db = this.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            values.put(Constants.COLUMN_TITLE, "Title"); // You can modify this as needed
-            values.put(Constants.COLUMN_LATITUDE, latitude);
-            values.put(Constants.COLUMN_LONGITUDE, longitude);
-            db.insert(Constants.LOCATION_TABLE_NAME, null, values);
-        } catch (SQLException e) {
-            // Handle exception
-            e.printStackTrace();
-        } finally {
-            if (db != null && db.isOpen()) {
-                db.close();
-            }
-        }
-    }
+//    public void insertLocation(double latitude, double longitude) {
+//        SQLiteDatabase db = null;
+//        try {
+//            db = this.getWritableDatabase();
+//            ContentValues values = new ContentValues();
+//            values.put(Constants.COLUMN_TITLE, "Title"); // You can modify this as needed
+//            values.put(Constants.COLUMN_LATITUDE, latitude);
+//            values.put(Constants.COLUMN_LONGITUDE, longitude);
+//            db.insert(Constants.LOCATION_TABLE_NAME, null, values);
+//        } catch (SQLException e) {
+//            // Handle exception
+//            e.printStackTrace();
+//        } finally {
+//            if (db != null && db.isOpen()) {
+//                db.close();
+//            }
+//        }
+//    }
 }

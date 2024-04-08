@@ -199,7 +199,7 @@ public class MyDatabase {
         try {
             cursor = db.query(
                     Constants.LOCATION_TABLE_NAME, // Table name
-                    new String[]{Constants.COLUMN_LONGITUDE, Constants.COLUMN_LATITUDE, Constants.COLUMN_TITLE}, // Columns to fetch
+                    new String[]{Constants.COLUMN_LONGITUDE, Constants.COLUMN_LATITUDE, Constants.COLUMN_TITLE, Constants.COLUMN_DISTANCE, Constants.COLUMN_CALORIES, Constants.COLUMN_STEPS}, // Columns to fetch
                     null, // Selection
                     null, // Selection arguments
                     null, // Group by
@@ -213,7 +213,10 @@ public class MyDatabase {
                     String longitude = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LONGITUDE));
                     String latitude = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LATITUDE));
                     String title = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_TITLE));
-                    HistoryItem historyItem = new HistoryItem(title, "Destination: " + latitude + ", " + longitude);
+                    String distance = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DISTANCE));
+                    String calories = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_CALORIES));
+                    String steps = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_STEPS));
+                    HistoryItem historyItem = new HistoryItem(title, "Destination: " + latitude + ", " + longitude, distance + "\n" + "M", calories + "\n" + "KCAL", steps + "\n" + "STEPS");
                     historyItems.add(historyItem);
                 } while (cursor.moveToNext());
             }

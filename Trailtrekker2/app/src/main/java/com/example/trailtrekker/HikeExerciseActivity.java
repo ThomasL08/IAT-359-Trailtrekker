@@ -235,16 +235,37 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
 
         //Save data to history table
 
+
+        //save title
         String answer = db.getTitle(GlobalVariables.historyIndex+1);
         db.insertHistoryTitle(Constants.COLUMN_TITLE, answer);
 
+        //save lat
         ContentValues lat = new ContentValues();
         lat.put(Constants.COLUMN_LATITUDE, prevLocation.getLatitude());
         db.updateHistoryRow(GlobalVariables.historyIndex, lat);
 
+        //save long
         ContentValues lng = new ContentValues();
         lng.put(Constants.COLUMN_LONGITUDE, prevLocation.getLongitude());
         db.updateHistoryRow(GlobalVariables.historyIndex, lng);
+
+        //save calories burned
+        ContentValues calories = new ContentValues();
+        calories.put(Constants.COLUMN_CALORIES, GlobalVariables.calories);
+        db.updateHistoryRow(GlobalVariables.historyIndex, calories);
+
+        //save distance travelled
+        String formattedDistance = String.format("%.1f", GlobalVariables.distance);
+
+        ContentValues distance = new ContentValues();
+        distance.put(Constants.COLUMN_DISTANCE, formattedDistance);
+        db.updateHistoryRow(GlobalVariables.historyIndex, distance);
+
+        //save steps taken
+        ContentValues steps = new ContentValues();
+        steps.put(Constants.COLUMN_STEPS, GlobalVariables.stepCount);
+        db.updateHistoryRow(GlobalVariables.historyIndex, steps);
     }
 
     public void onClickBack(View view) {

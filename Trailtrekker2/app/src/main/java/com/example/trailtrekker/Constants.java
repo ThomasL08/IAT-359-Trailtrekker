@@ -13,7 +13,7 @@ public class Constants {
     public static final String HEIGHT = "Height";
     public static final String ACTIVITY_TYPE = "ActivityType";
     public static final int MAX_QUESTIONS = 4; // Maximum number of questions for any activity
-    public static final int DATABASE_VERSION = 14; // Database version
+    public static final int DATABASE_VERSION = 17; // Database version
     // Prefix for dynamic question columns in the database
     public static final String QUESTION_PREFIX = "Question_";
 
@@ -23,6 +23,10 @@ public class Constants {
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_LATITUDE = "latitude";
     public static final String COLUMN_LONGITUDE = "longitude";
+    public static final String COLUMN_DISTANCE = "distance";
+    public static final String COLUMN_CALORIES = "calories";
+    public static final String COLUMN_STEPS = "steps";
+
 
 
     // Add more activity-specific questions arrays if needed

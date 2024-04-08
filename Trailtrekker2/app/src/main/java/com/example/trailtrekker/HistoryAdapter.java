@@ -29,9 +29,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         HistoryItem historyItem = historyList.get(position);
         holder.titleTextView.setText(historyItem.getTitle());
         holder.destinationTextView.setText(historyItem.getDestination());
-//        holder.distanceTextView.setText(historyItem.getDistance());
-//        holder.longitudeTextView.setText(historyItem.getLongitude());
-//        holder.latitudeTextView.setText(historyItem.getLatitude());
+        holder.distanceTextView.setText(historyItem.getDistance());
+        holder.caloriesTextView.setText(historyItem.getCalories());
+        holder.stepsTextView.setText(historyItem.getSteps());
+
     }
 
     @Override
@@ -40,19 +41,19 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView stepsTextView;
+        TextView caloriesTextView;
         TextView destinationTextView;
         TextView distanceTextView;
         TextView titleTextView;
-        TextView longitudeTextView;
-        TextView latitudeTextView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             titleTextView = itemView.findViewById(R.id.title_text_view);
             destinationTextView = itemView.findViewById(R.id.destination_text_view);
-//            distanceTextView = itemView.findViewById(R.id.distance_text_view);
-//            longitudeTextView = itemView.findViewById(R.id.longitude_text_view);
-//            latitudeTextView = itemView.findViewById(R.id.latitude_text_view);
+            distanceTextView = itemView.findViewById(R.id.distance_text_view);
+            caloriesTextView = itemView.findViewById(R.id.calories_text_view);
+            stepsTextView = itemView.findViewById(R.id.steps_text_view);
         }
     }
 }
