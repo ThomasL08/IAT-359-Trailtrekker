@@ -1,30 +1,47 @@
 package com.example.trailtrekker;
 
 public class HistoryItem {
-    private String longitude;
-    private String latitude;
     private String title;
+//    private String longitude;
+//    private String latitude;
+    private String destination;
 
-    public HistoryItem(String longitude, String latitude, String title) {
-        this.title = "Title: " + title;
-        this.longitude = longitude;
-        this.latitude = latitude;
-
+    public HistoryItem(String title, String destination) {
+        this.title = title;
+        this.destination = destination;
+//        this.longitude = longitude;
+//        this.latitude = latitude;
     }
 
-    public String getLongitude() {
-        return longitude;
+    public String getTitle() {
+        return title;
     }
+    public String getDestination() {
+        return destination;
+    }
+//    public String getDistance() {
+//        return distance;
+//    }
 
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
-    }
-
-    public String getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
-    }
+//    public void setTitle(String title) {
+//        this.title = title;
+//    }
+//
+//    public String getLongitude() {
+//        return longitude;
+//    }
+//
+//    public void setLongitude(String longitude) {
+//        this.longitude = longitude;
+//    }
+//
+//    public String getLatitude() {
+//        return latitude;
+//    }
+//
+//    public void setLatitude(String latitude) {
+//        this.latitude = latitude;
+//    }
 }
+
+

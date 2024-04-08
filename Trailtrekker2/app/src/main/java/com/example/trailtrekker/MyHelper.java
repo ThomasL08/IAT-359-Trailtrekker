@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.widget.Toast;
 
 public class MyHelper extends SQLiteOpenHelper {
     private Context context;
@@ -20,7 +19,7 @@ public class MyHelper extends SQLiteOpenHelper {
                     Constants.STEP_COUNT + " INTEGER, " +
                     Constants.WEIGHT + " FLOAT, " +
                     Constants.HEIGHT + " FLOAT, " +
-                    Constants.CALORIES + " INTEGER);" ;
+                    Constants.CALORIES + " INTEGER);";
 
     // New location table creation query
     private static final String CREATE_LOCATION_TABLE =
@@ -28,7 +27,7 @@ public class MyHelper extends SQLiteOpenHelper {
                     Constants.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     Constants.COLUMN_TITLE + " TEXT, " +
                     Constants.COLUMN_LATITUDE + " REAL, " +
-                    Constants.COLUMN_LONGITUDE + " REAL);" ;
+                    Constants.COLUMN_LONGITUDE + " REAL);";
 
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS " + Constants.TABLE_NAME;
 
@@ -45,11 +44,9 @@ public class MyHelper extends SQLiteOpenHelper {
 
             // Create the location table
             db.execSQL(CREATE_LOCATION_TABLE);
-
-            Toast.makeText(context, "Database and tables created successfully", Toast.LENGTH_LONG).show();
-//            Toast.makeText(context, "exec onCreate() called", Toast.LENGTH_LONG).show();
         } catch (SQLException e) {
-            Toast.makeText(context, "exception onCreate() db", Toast.LENGTH_LONG).show();
+            // Handle exception
+            e.printStackTrace();
         }
     }
 
@@ -59,20 +56,27 @@ public class MyHelper extends SQLiteOpenHelper {
             db.execSQL(DROP_TABLE);
             onCreate(db);
         } catch (SQLException e) {
-            Toast.makeText(context, "exception onUpgrade() db", Toast.LENGTH_LONG).show();
+            // Handle exception
+            e.printStackTrace();
         }
-
     }
 
-    // Method to insert location data into the location table
-//    public long insertLocation(double latitude, double longitude) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        ContentValues values = new ContentValues();
-//        values.put(Constants.COLUMN_LATITUDE, latitude);
-//        values.put(Constants.COLUMN_LONGITUDE, longitude);
-//        long newRowId = db.insert(Constants.LOCATION_TABLE_NAME, null, values);
-//        db.close();
-//        return newRowId;
-//    }
+    public void insertLocation(double latitude, double longitude) {
+        SQLiteDatabase db = null;
+        try {
+            db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(Constants.COLUMN_TITLE, "Title"); // You can modify this as needed
+            values.put(Constants.COLUMN_LATITUDE, latitude);
+            values.put(Constants.COLUMN_LONGITUDE, longitude);
+            db.insert(Constants.LOCATION_TABLE_NAME, null, values);
+        } catch (SQLException e) {
+            // Handle exception
+            e.printStackTrace();
+        } finally {
+            if (db != null && db.isOpen()) {
+                db.close();
+            }
+        }
+    }
 }
-

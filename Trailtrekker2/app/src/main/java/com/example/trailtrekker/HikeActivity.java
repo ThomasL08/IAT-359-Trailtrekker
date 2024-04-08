@@ -30,8 +30,8 @@ public class HikeActivity extends AppCompatActivity {
 
         db = new MyDatabase(this);
 
-        GlobalVariables.historyIndex = db.getRowCount()+1;
-        Log.d("count", String.valueOf(GlobalVariables.historyIndex));
+        GlobalVariables.dataIndex = db.getRowCount()+1;
+        Log.d("count", String.valueOf(GlobalVariables.dataIndex));
 
         // Get the activity type from intent
         Intent intent = getIntent();
@@ -97,25 +97,24 @@ public class HikeActivity extends AppCompatActivity {
                 case 1:
 //                    Toast.makeText(this, "title saved: " + answer, Toast.LENGTH_SHORT).show();
                     db.insertData(Constants.TITLE, answer);
-                    db.insertHistoryTitle(Constants.COLUMN_TITLE, answer);
                     break;
                 case 2:
 //                    Toast.makeText(this, "calories saved: " + answer, Toast.LENGTH_SHORT).show();
                     ContentValues caloriesContent = new ContentValues();
                     caloriesContent.put(Constants.CALORIES, answer);
-                    db.updateRow(GlobalVariables.historyIndex, caloriesContent);
+                    db.updateRow(GlobalVariables.dataIndex, caloriesContent);
                     break;
                 case 3:
 //                    Toast.makeText(this, "distance saved: " + answer, Toast.LENGTH_SHORT).show();
                     ContentValues distanceContent = new ContentValues();
                     distanceContent.put(Constants.DISTANCE, answer);
-                    db.updateRow(GlobalVariables.historyIndex, distanceContent);
+                    db.updateRow(GlobalVariables.dataIndex, distanceContent);
                     break;
                 case 4:
 //                    Toast.makeText(this, "step count saved: " + answer, Toast.LENGTH_SHORT).show();
                     ContentValues stepCountContent = new ContentValues();
                     stepCountContent.put(Constants.STEP_COUNT, answer);
-                    db.updateRow(GlobalVariables.historyIndex, stepCountContent);
+                    db.updateRow(GlobalVariables.dataIndex, stepCountContent);
                     break;
             }
         } else {

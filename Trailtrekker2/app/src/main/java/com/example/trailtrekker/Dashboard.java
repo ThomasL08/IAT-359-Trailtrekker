@@ -33,6 +33,8 @@ public class Dashboard extends AppCompatActivity {
         arrowButton = findViewById(R.id.arrow_button);
         timeTV = findViewById(R.id.timeTV);
 
+        GlobalVariables.historyIndex = db.getHistoryRowCount();
+
         // Update greeting and username
         updateGreetingAndUsername();
 

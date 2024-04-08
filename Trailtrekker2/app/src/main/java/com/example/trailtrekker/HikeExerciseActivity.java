@@ -3,6 +3,7 @@ package com.example.trailtrekker;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -44,10 +45,10 @@ import java.util.Locale;
 
 public class HikeExerciseActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, SensorEventListener, LocationListener {
 
+    private static final int DEFAULT_WEIGHT_VALUE = 70;
     MyHelper dbHelper;
     MyDatabase db;
     Cursor cursor;
-
     private FusedLocationProviderClient fusedLocationClient;
     GoogleMap myMap;
 
@@ -89,7 +90,7 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
     private float walkMET = 3.0f;
     private int calories = 0;
     private int weight;
-
+    String weightStr = db.getWeight();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,10 +128,10 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         gDisTV = findViewById(R.id.gDisTV);
         gStepTV = findViewById(R.id.gStepTV);
 
-        titleTV.setText(db.getTitle(GlobalVariables.historyIndex));
-        gCalTV.setText("Goal:" + "\n" + db.getCalories(GlobalVariables.historyIndex));
-        gStepTV.setText("Goal:" + "\n" + db.getStepCount(GlobalVariables.historyIndex));
-        gDisTV.setText("Goal:" + "\n" + db.getDistance(GlobalVariables.historyIndex));
+        titleTV.setText(db.getTitle(GlobalVariables.dataIndex));
+        gCalTV.setText("Goal:" + "\n" + db.getCalories(GlobalVariables.dataIndex));
+        gStepTV.setText("Goal:" + "\n" + db.getStepCount(GlobalVariables.dataIndex));
+        gDisTV.setText("Goal:" + "\n" + db.getDistance(GlobalVariables.dataIndex));
 
 
         //STEP COUNTER/////////////////////////////////////////
@@ -164,14 +165,21 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
 
         //CALORIE COUNTER/////////////////////////////////////////
         calTV.setText("-" + "\n" + "\n" + "KCAL");
-        weight = Integer.parseInt(db.getWeight());
+        String weightStr = db.getWeight();
+        int weight = DEFAULT_WEIGHT_VALUE; // Default weight value
+        if (weightStr != null) {
+            try {
+                weight = Integer.parseInt(weightStr);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
         countCalories(walkMET, weight);
         prevLocation = myLocationManger.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     }
-
     //ACTIVITY/////////////////////////////////////////
     public void onClickStart(View view) {
-        GlobalVariables.historyIndex++;
+        GlobalVariables.dataIndex++;
 
         //Check if physical activity permission is granted
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
@@ -196,16 +204,47 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
             disTV.setText("0" + "\n" + "\n" + "M");
             calTV.setText("0" + "\n" + "\n" + "KCAL");
         }
+//        // Start timer to save location data every 5 seconds
+//        handler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                saveLocationData();
+//
+//                // Run this method again after 5 seconds
+//                handler.postDelayed(this, 5000);
+//            }
+//        }, 5000);
     }
 
+//    private void saveLocationData() {
+//        if (prevLocation != null) {
+//            dbHelper.insertLocation(prevLocation.getLatitude(), prevLocation.getLongitude());
+//        }
+//    }
     public void onClickStop(View view) {
+        GlobalVariables.historyIndex++;
+
         GlobalVariables.exercising = false;
         isStopWatchRunning = false;
 
         startButton.setVisibility(View.VISIBLE);
         stopButton.setVisibility(View.GONE);
 
-//        db.insertHistoryData(Constants.COLUMN_LATITUDE,"test");
+        Log.d("id", String.valueOf(GlobalVariables.historyIndex));
+        Log.d("id", String.valueOf(GlobalVariables.dataIndex));
+
+        //Save data to history table
+
+        String answer = db.getTitle(GlobalVariables.historyIndex+1);
+        db.insertHistoryTitle(Constants.COLUMN_TITLE, answer);
+
+        ContentValues lat = new ContentValues();
+        lat.put(Constants.COLUMN_LATITUDE, prevLocation.getLatitude());
+        db.updateHistoryRow(GlobalVariables.historyIndex, lat);
+
+        ContentValues lng = new ContentValues();
+        lng.put(Constants.COLUMN_LONGITUDE, prevLocation.getLongitude());
+        db.updateHistoryRow(GlobalVariables.historyIndex, lng);
     }
 
     public void onClickBack(View view) {

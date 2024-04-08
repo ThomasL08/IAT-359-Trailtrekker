@@ -6,15 +6,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
 import java.util.ArrayList;
-
-
 import java.util.List;
 
 public class MyDatabase {
     private SQLiteDatabase db;
     private Context context;
-    private final MyHelper helper;
+    private static MyHelper helper;
 
     public MyDatabase(Context c) {
         context = c;
@@ -53,7 +52,7 @@ public class MyDatabase {
     public String getTitle(int uid) {
         SQLiteDatabase db = helper.getReadableDatabase();
         String query = "SELECT " + Constants.TITLE + " FROM " + Constants.TABLE_NAME + " WHERE " + Constants.UID + " = ?";
-        String[] selectionArgs = {String.valueOf(uid)}; // Convert uid to string array
+        String[] selectionArgs = {String.valueOf(uid)};
         Cursor cursor = db.rawQuery(query, selectionArgs);
         String result = null;
         if (cursor != null && cursor.moveToFirst()) {
@@ -77,12 +76,11 @@ public class MyDatabase {
         return result;
     }
 
-
     @SuppressLint("Range")
     public String getCalories(int uid) {
         SQLiteDatabase db = helper.getReadableDatabase();
         String query = "SELECT " + Constants.CALORIES + " FROM " + Constants.TABLE_NAME + " WHERE " + Constants.UID + " = ?";
-        String[] selectionArgs = {String.valueOf(uid)}; // Convert uid to string array
+        String[] selectionArgs = {String.valueOf(uid)};
         Cursor cursor = db.rawQuery(query, selectionArgs);
         String result = null;
         if (cursor != null && cursor.moveToFirst()) {
@@ -92,12 +90,11 @@ public class MyDatabase {
         return result;
     }
 
-
     @SuppressLint("Range")
     public String getStepCount(int uid) {
         SQLiteDatabase db = helper.getReadableDatabase();
         String query = "SELECT " + Constants.STEP_COUNT + " FROM " + Constants.TABLE_NAME + " WHERE " + Constants.UID + " = ?";
-        String[] selectionArgs = {String.valueOf(uid)}; // Convert uid to string array
+        String[] selectionArgs = {String.valueOf(uid)};
         Cursor cursor = db.rawQuery(query, selectionArgs);
         String result = null;
         if (cursor != null && cursor.moveToFirst()) {
@@ -111,7 +108,7 @@ public class MyDatabase {
     public String getDistance(int uid) {
         SQLiteDatabase db = helper.getReadableDatabase();
         String query = "SELECT " + Constants.DISTANCE + " FROM " + Constants.TABLE_NAME + " WHERE " + Constants.UID + " = ?";
-        String[] selectionArgs = {String.valueOf(uid)}; // Convert uid to string array
+        String[] selectionArgs = {String.valueOf(uid)};
         Cursor cursor = db.rawQuery(query, selectionArgs);
         String result = null;
         if (cursor != null && cursor.moveToFirst()) {
@@ -122,12 +119,12 @@ public class MyDatabase {
     }
 
     @SuppressLint("Range")
-    public String getWeight() {
+    public static String getWeight() {
         SQLiteDatabase db = helper.getReadableDatabase();
 
         String query = "SELECT " + Constants.WEIGHT + " FROM " + Constants.TABLE_NAME +
                 " WHERE " + Constants.UID + " = ?";
-        String[] selectionArgs = { "1" }; // ID 1
+        String[] selectionArgs = {"1"}; // ID 1
         Cursor cursor = db.rawQuery(query, selectionArgs);
 
         String result = null;
@@ -144,7 +141,7 @@ public class MyDatabase {
 
         String query = "SELECT " + Constants.HEIGHT + " FROM " + Constants.TABLE_NAME +
                 " WHERE " + Constants.UID + " = ?";
-        String[] selectionArgs = { "1" }; // ID 1
+        String[] selectionArgs = {"1"}; // ID 1
         Cursor cursor = db.rawQuery(query, selectionArgs);
 
         String result = null;
@@ -167,10 +164,6 @@ public class MyDatabase {
         return count;
     }
 
-
-
-    //HISTORY//////////////////////////////////////
-
     public void insertHistoryTitle(String columnName, String newValue) {
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -178,7 +171,26 @@ public class MyDatabase {
         db.insert(Constants.LOCATION_TABLE_NAME, null, contentValues);
     }
 
+    public void updateHistoryRow(long rowId, ContentValues contentValues) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        String selection = Constants.COLUMN_ID + "=?";
+        String[] selectionArgs = {String.valueOf(rowId)};
+        db.update(Constants.LOCATION_TABLE_NAME, contentValues, selection, selectionArgs);
+    }
+    public int getHistoryRowCount() {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + Constants.LOCATION_TABLE_NAME, null);
+        int count = 0;
+        if (cursor != null) {
+            cursor.moveToFirst();
+            count = cursor.getInt(0);
+            cursor.close();
+        }
+        return count;
+    }
 
+
+    @SuppressLint("Range")
     public List<HistoryItem> getAllHistoryItems() {
         List<HistoryItem> historyItems = new ArrayList<>();
         SQLiteDatabase db = helper.getReadableDatabase();
@@ -198,10 +210,10 @@ public class MyDatabase {
             // Loop through the cursor and create HistoryItem objects
             if (cursor != null && cursor.moveToFirst()) {
                 do {
-                    @SuppressLint("Range") String longitude = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LONGITUDE));
-                    @SuppressLint("Range") String latitude = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LATITUDE));
-                    @SuppressLint("Range") String title = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_TITLE));
-                    HistoryItem historyItem = new HistoryItem(longitude, latitude, title);
+                    String longitude = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LONGITUDE));
+                    String latitude = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LATITUDE));
+                    String title = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_TITLE));
+                    HistoryItem historyItem = new HistoryItem(title, "Destination: " + latitude + ", " + longitude);
                     historyItems.add(historyItem);
                 } while (cursor.moveToNext());
             }
@@ -217,3 +229,4 @@ public class MyDatabase {
         return historyItems;
     }
 }
+
