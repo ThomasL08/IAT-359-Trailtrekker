@@ -81,7 +81,7 @@
                     android:id="@+id/tile1ImageView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/rectangle" />
+                    android:src="@drawable/hike_icon" />
 
 
             </LinearLayout>
@@ -111,7 +111,8 @@
                     android:id="@+id/tile2ImageView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/rectangle" />
+                    android:onClick="onSettingsClick"
+                    android:src="@drawable/account" />
 
             </LinearLayout>
 
@@ -138,9 +139,9 @@
 
                 <ImageView
                     android:id="@+id/tile3ImageView"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/rectangle" />
+                    android:src="@drawable/history" />
 
             </LinearLayout>
 
@@ -170,7 +171,8 @@
                     android:id="@+id/tile4ImageView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/rectangle" />
+                    android:onClick="onPrefClick"
+                    android:src="@drawable/pref" />
 
 
             </LinearLayout>
@@ -237,29 +239,32 @@
             android:id="@+id/button1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/hike"
-            android:background="@android:color/transparent"
             android:layout_weight="1"
+            android:background="@android:color/transparent"
             android:clickable="true"
-            android:focusableInTouchMode="true"/>
+            android:focusableInTouchMode="true"
+            android:onClick="onHikeClick"
+            android:src="@drawable/hike" />
 
         <!-- Button 2 -->
         <ImageButton
             android:id="@+id/button2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/drawer"
+            android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:layout_weight="1"/>
+            android:onClick="onDashClick"
+            android:src="@drawable/drawer" />
 
         <!-- Button 3 -->
         <ImageButton
             android:id="@+id/button3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/goal"
+            android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:layout_weight="1"/>
+            android:onClick="onHistClick"
+            android:src="@drawable/goal" />
 
         <!-- Button 4 -->
         <ImageButton

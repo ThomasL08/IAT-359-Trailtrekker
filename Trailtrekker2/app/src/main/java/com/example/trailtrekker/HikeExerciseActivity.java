@@ -48,12 +48,18 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
     private static final int DEFAULT_WEIGHT_VALUE = 70;
     MyHelper dbHelper;
     MyDatabase db;
-    Cursor cursor;
     private FusedLocationProviderClient fusedLocationClient;
     GoogleMap myMap;
 
+    //recommendations
     private static final double SURREY_LAT = 49.189592;
     private static final double SURREY_LONG = -122.847834;
+
+    private static final double VANCOUVER_LAT = 49.24966000;
+    private static final double VANCOUVER_LONG = -123.11934000;
+
+    private static final double BURNABY_LAT = 49.246445;
+    private static final double BURNABY_LONG = -122.994560;
 
     //Buttons
     private Button backButton;
@@ -79,7 +85,6 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
     //Step Counter
     private SensorManager mySensorManager;
     private Sensor stepCountSensor;
-    private TextView stepCountTV;
 
     //Distance
     private LocationManager myLocationManger;
@@ -90,7 +95,11 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
     private float walkMET = 3.0f;
     private int calories = 0;
     private int weight;
-    String weightStr = db.getWeight();
+
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,10 +142,12 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         gStepTV.setText("Goal:" + "\n" + db.getStepCount(GlobalVariables.dataIndex));
         gDisTV.setText("Goal:" + "\n" + db.getDistance(GlobalVariables.dataIndex));
 
+        calTV.setText(GlobalVariables.calories + "\n" + "\n" + "KCAL");
+        stepTV.setText(GlobalVariables.stepCount + "\n" + "\n" + "STEPS");
+        disTV.setText(GlobalVariables.distance + "\n" + "\n" + "M");
+
 
         //STEP COUNTER/////////////////////////////////////////
-        stepCountTV = findViewById(R.id.stepTV);
-        stepCountTV.setText("-" + "\n" + "\n" + "STEPS");
 
         mySensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         stepCountSensor = mySensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
@@ -160,11 +171,7 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
             Toast.makeText(HikeExerciseActivity.this, "GPS provided not enable", Toast.LENGTH_SHORT).show();
         }
 
-        disTV.setText("-" + "\n" + "\n" + "M");
-
-
         //CALORIE COUNTER/////////////////////////////////////////
-        calTV.setText("-" + "\n" + "\n" + "KCAL");
         String weightStr = db.getWeight();
         int weight = DEFAULT_WEIGHT_VALUE; // Default weight value
         if (weightStr != null) {
@@ -190,11 +197,7 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
             }
 
             prevLocation = myLocationManger.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-            GlobalVariables.seconds = 0;
             GlobalVariables.exercising = true;
-            GlobalVariables.distance = 0;
-            GlobalVariables.stepCount = 0;
 
             startButton.setVisibility(View.GONE);
             stopButton.setVisibility(View.VISIBLE);
@@ -204,23 +207,8 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
             disTV.setText("0" + "\n" + "\n" + "M");
             calTV.setText("0" + "\n" + "\n" + "KCAL");
         }
-//        // Start timer to save location data every 5 seconds
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                saveLocationData();
-//
-//                // Run this method again after 5 seconds
-//                handler.postDelayed(this, 5000);
-//            }
-//        }, 5000);
     }
 
-//    private void saveLocationData() {
-//        if (prevLocation != null) {
-//            dbHelper.insertLocation(prevLocation.getLatitude(), prevLocation.getLongitude());
-//        }
-//    }
     public void onClickStop(View view) {
         GlobalVariables.historyIndex++;
 
@@ -266,6 +254,15 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         ContentValues steps = new ContentValues();
         steps.put(Constants.COLUMN_STEPS, GlobalVariables.stepCount);
         db.updateHistoryRow(GlobalVariables.historyIndex, steps);
+
+        GlobalVariables.seconds = 0;
+        GlobalVariables.distance = 0;
+        GlobalVariables.stepCount = 0;
+
+        //go to history after stopping hike
+        Intent intent = new Intent(HikeExerciseActivity.this, RecyclerActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     public void onClickBack(View view) {
@@ -312,9 +309,6 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         super.onResume();
         runStopWatch();
         countCalories(walkMET, weight);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
         mySensorManager.registerListener(this, stepCountSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
@@ -322,6 +316,7 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
     protected void onPause() {
         super.onPause();
         stopStopWatch();
+        mySensorManager.unregisterListener(this, stepCountSensor);
     }
 
     @Override
@@ -334,7 +329,7 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER && GlobalVariables.exercising) {
             GlobalVariables.stepCount++;
-            stepCountTV.setText(String.valueOf(GlobalVariables.stepCount) + "\n" + "\n" + "STEPS");
+            stepTV.setText(GlobalVariables.stepCount + "\n" + "\n" + "STEPS");
         } else {
             GlobalVariables.stepCount = 0;
         }
@@ -489,16 +484,58 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         }
         currentLocation = myLocationManger.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         Location targetLocation = new Location("");
-        targetLocation.setLatitude(SURREY_LAT);
-        targetLocation.setLongitude(SURREY_LONG);
+
+        String currentCity = determineCurrentCity(currentLocation);
+        switch (currentCity) {
+            case "Surrey":
+                targetLocation.setLatitude(SURREY_LAT);
+                targetLocation.setLongitude(SURREY_LONG);
+                break;
+            case "Vancouer":
+                targetLocation.setLatitude(VANCOUVER_LAT);
+                targetLocation.setLongitude(VANCOUVER_LONG);
+                break;
+            case "Burnaby":
+                targetLocation.setLatitude(BURNABY_LAT);
+                targetLocation.setLongitude(BURNABY_LONG);
+
+        }
+//        targetLocation.setLatitude(SURREY_LAT);
+//        targetLocation.setLongitude(SURREY_LONG);
         float distance = currentLocation.distanceTo(targetLocation);
         float distThreshold = 5000;
         if (distance <= distThreshold) {
-            String url = "https://www.alltrails.com/canada/british-columbia/surrey";
+            String url = null;
+            switch (currentCity) {
+                case "Surrey":
+                    url = "https://www.alltrails.com/canada/british-columbia/surrey";
+                    break;
+                case "Vancouver":
+                    url = "https://www.alltrails.com/canada/british-columbia/vancouver";
+                    break;
+                case "Burnaby":
+                    url = "https://www.alltrails.com/canada/british-columbia/burnaby";
+                    break;
+            }
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             startActivity(intent);
         } else {
             Toast.makeText(this, "No hiking spots nearby", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String determineCurrentCity(Location location) {
+        if (location.getLatitude() >= 49.1 && location.getLatitude() <= 49.3 &&
+                location.getLongitude() >= -123.2 && location.getLongitude() <= -122.9) {
+            return "Vancouver";
+        } else if (location.getLatitude() >= 49.1 && location.getLatitude() <= 49.3 &&
+                location.getLongitude() >= -122.9 && location.getLongitude() <= -122.6) {
+            return "Surrey";
+        } else if (location.getLatitude() >= 49.2 && location.getLatitude() <= 49.3 &&
+                location.getLongitude() >= -123.1 && location.getLongitude() <= -122.9) {
+            return "Burnaby";
+        } else {
+            return "Unknown";
         }
     }
 }

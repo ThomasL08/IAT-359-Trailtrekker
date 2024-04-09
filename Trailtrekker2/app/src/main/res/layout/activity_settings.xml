@@ -44,7 +44,7 @@
                 app:layout_gravity="fill"
                 app:layout_row="0" />
 
-            <Button
+            <TextView
                 android:id="@+id/titleButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -52,7 +52,8 @@
                 android:text="Settings"
                 app:layout_columnWeight="2"
                 app:layout_gravity="fill"
-                android:textColor="@color/beige"/>
+                android:textColor="@color/dark_green"
+                android:textStyle="bold"/>
 
         </androidx.gridlayout.widget.GridLayout>
 
@@ -165,5 +166,6 @@
             android:textColor="@color/dark_beige"
             android:onClick="onClick"
             android:text="Save" />
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

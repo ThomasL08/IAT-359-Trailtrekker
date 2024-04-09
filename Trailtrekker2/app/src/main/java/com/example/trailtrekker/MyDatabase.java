@@ -177,6 +177,7 @@ public class MyDatabase {
         String[] selectionArgs = {String.valueOf(rowId)};
         db.update(Constants.LOCATION_TABLE_NAME, contentValues, selection, selectionArgs);
     }
+
     public int getHistoryRowCount() {
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + Constants.LOCATION_TABLE_NAME, null);
@@ -189,8 +190,25 @@ public class MyDatabase {
         return count;
     }
 
+    public void updateItem(int uid, String title, String latitude, String longitude, String distance, String calories, String steps) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(Constants.COLUMN_TITLE, title);
+        values.put(Constants.COLUMN_LATITUDE, latitude);
+        values.put(Constants.COLUMN_LONGITUDE, longitude);
+        values.put(Constants.COLUMN_DISTANCE, distance);
+        values.put(Constants.COLUMN_CALORIES, calories);
+        values.put(Constants.COLUMN_STEPS, steps);
+        String selection = Constants.COLUMN_ID + "=?";
+        String[] selectionArgs = {String.valueOf(uid)};
+        db.update(Constants.LOCATION_TABLE_NAME, values, selection, selectionArgs);
+        db.close();
+    }
 
-    @SuppressLint("Range")
+    public void updateItem(int uid) {
+        // Implement this method if needed
+    }
+
     public List<HistoryItem> getAllHistoryItems() {
         List<HistoryItem> historyItems = new ArrayList<>();
         SQLiteDatabase db = helper.getReadableDatabase();
@@ -199,7 +217,7 @@ public class MyDatabase {
         try {
             cursor = db.query(
                     Constants.LOCATION_TABLE_NAME, // Table name
-                    new String[]{Constants.COLUMN_LONGITUDE, Constants.COLUMN_LATITUDE, Constants.COLUMN_TITLE, Constants.COLUMN_DISTANCE, Constants.COLUMN_CALORIES, Constants.COLUMN_STEPS}, // Columns to fetch
+                    new String[]{Constants.UID, Constants.COLUMN_LONGITUDE, Constants.COLUMN_LATITUDE, Constants.COLUMN_TITLE, Constants.COLUMN_DISTANCE, Constants.COLUMN_CALORIES, Constants.COLUMN_STEPS}, // Columns to fetch
                     null, // Selection
                     null, // Selection arguments
                     null, // Group by
@@ -210,13 +228,14 @@ public class MyDatabase {
             // Loop through the cursor and create HistoryItem objects
             if (cursor != null && cursor.moveToFirst()) {
                 do {
-                    String longitude = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LONGITUDE));
-                    String latitude = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LATITUDE));
-                    String title = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_TITLE));
-                    String distance = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DISTANCE));
-                    String calories = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_CALORIES));
-                    String steps = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_STEPS));
-                    HistoryItem historyItem = new HistoryItem(title, "Destination: " + latitude + ", " + longitude, distance + "\n" + "M", calories + "\n" + "KCAL", steps + "\n" + "STEPS");
+                    @SuppressLint("Range") int uid = cursor.getInt(cursor.getColumnIndex(Constants.UID));
+                    @SuppressLint("Range") String longitude = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LONGITUDE));
+                    @SuppressLint("Range") String latitude = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LATITUDE));
+                    @SuppressLint("Range") String title = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_TITLE));
+                    @SuppressLint("Range") String distance = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DISTANCE));
+                    @SuppressLint("Range") String calories = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_CALORIES));
+                    @SuppressLint("Range") String steps = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_STEPS));
+                    HistoryItem historyItem = new HistoryItem(uid, title, "Destination: " + latitude + ", " + longitude, distance + "\n" + "M", calories + "\n" + "KCAL", steps + "\n" + "STEPS");
                     historyItems.add(historyItem);
                 } while (cursor.moveToNext());
             }
@@ -232,4 +251,5 @@ public class MyDatabase {
         return historyItems;
     }
 }
+
 

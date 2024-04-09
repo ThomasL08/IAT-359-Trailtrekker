@@ -127,6 +127,23 @@ public class Dashboard extends AppCompatActivity {
     public void onSettingsClick(View view) {
         startActivity(new Intent(this, SettingsActivity.class));
     }
+    public void onDashClick(View view) {
+        startActivity(new Intent(this, Dashboard.class));
+    }
+    public void onPrefClick(View view) {
+        startActivity(new Intent(this, UIPreferences.class));
+    }
+    public void onHistClick(View view) {
+        startActivity(new Intent(this, RecyclerActivity.class));
+    }
+    public void onHikeClick(View view) {
+        if(GlobalVariables.exercising) {
+            startActivity(new Intent(this, HikeActivity.class));
+        }
+        else{
+            startActivity(new Intent(this, HikeExerciseActivity.class));
+        }
+    }
 }
 
 
