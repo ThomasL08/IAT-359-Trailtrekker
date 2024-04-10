@@ -32,9 +32,9 @@ public class Constants {
     // Add more activity-specific questions arrays if needed
     public static final String[] HIKING_QUESTIONS = {
             "Activity Title:",
-            "Set calories goal:",
-            "Set distance goal:",
-            "Set step count goal:"
+            "Set calories goal (KCAL):",
+            "Set distance goal (M):",
+            "Set step count goal (STEPS):"
     };
 //
 //    public static final String[] WALK_QUESTIONS = {

@@ -31,6 +31,7 @@ public class HikeActivity extends AppCompatActivity {
         db = new MyDatabase(this);
 
         GlobalVariables.dataIndex = db.getRowCount()+1;
+//        GlobalVariables.dataIndex = db.getRowCount();
         Log.d("count", String.valueOf(GlobalVariables.dataIndex));
 
         // Get the activity type from intent
@@ -115,6 +116,8 @@ public class HikeActivity extends AppCompatActivity {
                     ContentValues stepCountContent = new ContentValues();
                     stepCountContent.put(Constants.STEP_COUNT, answer);
                     db.updateRow(GlobalVariables.dataIndex, stepCountContent);
+
+//                    GlobalVariables.dataIndex++;
                     break;
             }
         } else {

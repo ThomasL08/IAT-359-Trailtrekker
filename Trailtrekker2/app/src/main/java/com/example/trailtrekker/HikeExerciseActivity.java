@@ -217,15 +217,15 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
 
         startButton.setVisibility(View.VISIBLE);
         stopButton.setVisibility(View.GONE);
+        stopButton.setVisibility(View.GONE);
 
         Log.d("id", String.valueOf(GlobalVariables.historyIndex));
         Log.d("id", String.valueOf(GlobalVariables.dataIndex));
 
         //Save data to history table
 
-
         //save title
-        String answer = db.getTitle(GlobalVariables.historyIndex+1);
+        String answer = db.getTitle(GlobalVariables.dataIndex-1);
         db.insertHistoryTitle(Constants.COLUMN_TITLE, answer);
 
         //save lat
@@ -258,6 +258,7 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         GlobalVariables.seconds = 0;
         GlobalVariables.distance = 0;
         GlobalVariables.stepCount = 0;
+        GlobalVariables.calories = 0;
 
         //go to history after stopping hike
         Intent intent = new Intent(HikeExerciseActivity.this, RecyclerActivity.class);
@@ -335,7 +336,7 @@ public class HikeExerciseActivity extends AppCompatActivity implements OnMapRead
         }
     }
 
-    @Override
+    @Override   
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 

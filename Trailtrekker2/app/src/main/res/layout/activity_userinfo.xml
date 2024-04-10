@@ -48,57 +48,57 @@
         android:layout_marginTop="8dp"
         android:textColorHint="@color/lighter_green"/>
 
-    <TextView
-        android:id="@+id/heightLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Height"
-        android:textColor="@color/dark_green"
-        android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nameEditText"
-        android:layout_marginTop="24dp"/>
+        <TextView
+            android:id="@+id/heightLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Height (M)"
+            android:textColor="@color/dark_green"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/nameEditText" />
 
-    <EditText
-        android:id="@+id/heightEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/edit_text_outline"
-        android:hint="Your height"
-        android:inputType="numberDecimal"
-        android:padding="10dp"
-        android:textColor="@color/dark_green"
-        app:layout_constraintStart_toEndOf="@+id/heightLabel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/heightLabel"
-        android:layout_marginTop="8dp"
-        android:textColorHint="@color/lighter_green"/>
+        <EditText
+            android:id="@+id/heightEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/edit_text_outline"
+            android:hint="Your height"
+            android:inputType="numberDecimal"
+            android:padding="10dp"
+            android:textColor="@color/dark_green"
+            android:textColorHint="@color/lighter_green"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/heightLabel"
+            app:layout_constraintTop_toBottomOf="@id/heightLabel" />
 
-    <TextView
-        android:id="@+id/weightLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Weight"
-        android:textColor="@color/dark_green"
-        android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/heightEditText"
-        android:layout_marginTop="24dp"/>
+        <TextView
+            android:id="@+id/weightLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Weight (KG)"
+            android:textColor="@color/dark_green"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/heightEditText" />
 
-    <EditText
-        android:id="@+id/weightEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/edit_text_outline"
-        android:hint="Your weight"
-        android:inputType="numberDecimal"
-        android:padding="10dp"
-        android:textColor="@color/dark_green"
-        app:layout_constraintStart_toEndOf="@+id/weightLabel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/weightLabel"
-        android:layout_marginTop="8dp"
-        android:textColorHint="@color/lighter_green"/>
+        <EditText
+            android:id="@+id/weightEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/edit_text_outline"
+            android:hint="Your weight"
+            android:inputType="numberDecimal"
+            android:padding="10dp"
+            android:textColor="@color/dark_green"
+            android:textColorHint="@color/lighter_green"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/weightLabel"
+            app:layout_constraintTop_toBottomOf="@id/weightLabel" />
 
     <Button
         android:id="@+id/nextButton"
